@@ -5,8 +5,8 @@ import { randomFromCandidates } from '../helpers';
 
 class Game extends React.Component {
   constructor() {
-    super();
-    this.reset = this.reset.bind(this);
+    super()
+    this.reset = this.reset.bind(this)
 
     const gameSettings = {
       rows: 4,
@@ -17,23 +17,23 @@ class Game extends React.Component {
     this.state = {
       settings: gameSettings,
       squares: []
-    };
+    }
   }
 
   componentWillMount() {
-    this.reset();
+    this.reset()
   }
 
   reset() {
-    const noOfSquares = this.state.settings.rows * this.state.settings.cols;
-    const initialValues = [];
+    const noOfSquares = this.state.settings.rows * this.state.settings.cols
+    const initialValues = []
     for (let i = 0; i < noOfSquares; i++) {
-      initialValues.push(randomFromCandidates([0,1,2]));
+      initialValues.push(randomFromCandidates([0,1,2]))
     }
 
     this.setState({
       squares: initialValues
-    });
+    })
   }
 
   handleKeyDown(e) {
@@ -50,81 +50,103 @@ class Game extends React.Component {
   }
 
   calcNewBoardState(squares, direction) {
-    // TODO: 15
-    for (let i = 0; i <= 15; ++i) {
-      const index = (direction === 'right' || direction === 'down') ? 15 - i : i;
+    const cols = this.state.settings.cols
+    const noOfSquares = Object.keys(squares).length
+    for (let i = 0; i < noOfSquares; ++i) {
+      const index = (direction === 'right' || direction === 'down') ? noOfSquares - i : i
 
-      const currentValue = squares[index];
+      const currentValue = squares[index]
 
       // get comparison value and index depending on direction
       let comparisonIndex = 0;
       switch (direction) {
         case 'up':
-          comparisonIndex = index+4;
-          break;
+          comparisonIndex = index+cols
+          break
         case 'right':
-          if (index % 4 === 0) {
+          if (index % cols === 0) {
             // skip if leftmost column
-            continue;
+            continue
           } else {
-            comparisonIndex = index-1;
+            comparisonIndex = index-1
           }
-          break;
+          break
         case 'down':
-          comparisonIndex = index-4;
-          break;
+          comparisonIndex = index-cols
+          break
         case 'left':
-          if ((index + 1) % 4 === 0) {
+          if ((index + 1) % cols === 0) {
             // skip if rightmost column
-            continue;
+            continue
           } else {
-            comparisonIndex = index+1;
+            comparisonIndex = index+1
           }
-          break;
+          break
         default:
-          break;
+          break
       }
 
-      const comparisonValue = squares[comparisonIndex];
+      const comparisonValue = squares[comparisonIndex]
 
       // skip if comparison outside of board
       if (comparisonValue === undefined) {
-        continue;
+        continue
       }
 
       if (comparisonValue === currentValue) {
         // if equal: add equal values at current index and remove comparison value
-        squares[index] = currentValue * 2;
-        squares[comparisonIndex] = 0;
+        squares[index] = currentValue * 2
+        squares[comparisonIndex] = 0
       } else if (currentValue === 0) {
         // if current square is empty: move comparison to current
-        squares[index] = comparisonValue;
-        squares[comparisonIndex] = 0;
+        squares[index] = comparisonValue
+        squares[comparisonIndex] = 0
       }
     }
   }
 
-  // TODO: dynamisch an Settings anpassen
   fillBoardWithRandomNewValue(squares, direction) {
     // fill up random field on the opposite side
     // first: determine empty squares
-    let possibleOppositeRowIndexes = [];
-    if (direction === "down") {
-      //possibleOppositeRowIndexes = squares.slice(0, this.state.settings.cols);
-      possibleOppositeRowIndexes = [0,1,2,3];
-    } else if(direction === "up") {
-      //possibleOppositeRowIndexes = squares.slice(squares.length - this.state.settings.cols, this.state.settings.length);
-      possibleOppositeRowIndexes = [12,13,14,15];
-    } else if(direction === "right") {
-      possibleOppositeRowIndexes = [0,4,8,12];
-    } else if(direction === "left") {
-      possibleOppositeRowIndexes = [3,7,11,15];
+    const possibleOppositeRowIndexes = [];
+    const noOfSquares = Object.keys(squares).length
+    switch (direction) {
+      case 'up':
+        // lower row
+        for (let i = noOfSquares - this.state.settings.cols; i < noOfSquares; i++) {
+          possibleOppositeRowIndexes.push(i)
+        }
+        break
+      case 'down':
+        // upper row
+        for (let i = 0; i < this.state.settings.rows; i++) {
+          possibleOppositeRowIndexes.push(i)
+        }
+        break
+      case 'right':
+        // left col
+        for (let i = 0; i < noOfSquares; i++) {
+          if (i % this.state.settings.cols === 0) {
+            possibleOppositeRowIndexes.push(i)
+          }
+        }
+        break
+      case 'left':
+        // right col
+        for (let i = 0; i < noOfSquares; i++) {
+          if ((i+1) % this.state.settings.cols === 0) {
+            possibleOppositeRowIndexes.push(i)
+          }
+        }
+        break
+      default:
+        break
     }
 
-    let oppositeRowIndexes = [];
+    let oppositeRowIndexes = []
     possibleOppositeRowIndexes.forEach(function(n) {
       if (squares[n] === 0) {
-        oppositeRowIndexes.push(n);
+        oppositeRowIndexes.push(n)
       }
     });
 
