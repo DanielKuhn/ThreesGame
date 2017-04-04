@@ -128,8 +128,6 @@ class Game extends React.Component {
       }
     });
 
-    console.log(typeof oppositeRowIndexes);
-
     // second: if an empty square exists: fill with 1 or 2
     squares[randomFromCandidates(oppositeRowIndexes)] = randomFromCandidates([1,2]);
   }
